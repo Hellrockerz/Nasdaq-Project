@@ -1,5 +1,4 @@
 from urllib import request
-from bs4 import BeautifulSoup
 import requests
 import urllib.request, urllib.error, urllib.parse
 import xml.etree.ElementTree as ET
