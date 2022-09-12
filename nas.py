@@ -1,3 +1,4 @@
+from flask import Flask
 from urllib import request
 import requests
 import urllib.request, urllib.error, urllib.parse
@@ -24,4 +25,7 @@ headers = {
 response = requests.get(url, headers=headers)
 data = response.text
 tree = ET.fromstring(data)
-print('Channel', tree.find('channel')[0].text)
+print ('Title', tree.find('channel')[0].text)
+for child in tree.findall('.//item'):
+  print(child.find('title').text)
+  print(child.find('pubDate').text, "\n")
