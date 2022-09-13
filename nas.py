@@ -28,12 +28,13 @@ data = response.text
 tree = ET.fromstring(data)
 print ('Title', tree.find('channel')[0].text)
 with open('api.csv', 'w') as op:
-    op.write("Date, News\n")
+    op.write("Date | News\n")
 for child in tree.findall('.//item'):
   Date = child.find('pubDate').text
   News = child.find('title').text
   with open('api.csv', 'a') as op:
     op.write(Date)
+    op.write(' | ')
     op.write(News)
     op.write("\n")
 a = open('api.csv').read()
