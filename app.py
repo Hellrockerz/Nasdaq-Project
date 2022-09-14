@@ -6,13 +6,13 @@ app = Flask(__name__)
 api= Api(app)
 csv_path = './api.csv'
 
-class csv(Resource):
+class api_data(Resource):
     def get(self):
         data = pd.read_csv(csv_path)
         data = data.to_dict()
-        return {'data': data}, 200
+        return {'Data': data}, 200
 
-api.add_resource(csv, '/csv')
+api.add_resource(api_data, '/csv')
 
 if __name__ == '__main__':
     app.run(debug=True)

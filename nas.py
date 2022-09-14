@@ -1,16 +1,17 @@
-from urllib import request
 import requests
-import urllib.request, urllib.error, urllib.parse
 import xml.etree.ElementTree as ET
 import ssl
 import re
-import requests
+import csv
+from flask import Flask
+from flask_restful import Resource, Api
+import pandas as pd
 
 ctx = ssl.create_default_context()
 ctx.check_hostname= False
 ctx.verify_mode = ssl.CERT_NONE
 
-sym = input('Enter Ticker: ')
+sym = input('Enter Ticker: ').upper()
 url = f"https://www.nasdaq.com/feed/rssoutbound?symbol={sym}"
 
 headers = {
@@ -21,20 +22,41 @@ headers = {
 response = requests.get(url, headers=headers)
 data = response.text
 tree = ET.fromstring(data)
-# print ('Title', tree.find('channel')[0].text)
-with open('api.csv', 'w') as op:
-    op.write("Date | News\n")
+
+date = []
+news = []
+
 for child in tree.findall('.//item'):
-  Date = child.find('pubDate').text
+  ate = child.find('pubDate').text
+
+  Date = re.sub('\+[0-9]+', '', ate[5:])
+  if Date not in date:
+    date.append(Date)
+
   News = child.find('title').text
-  with open('api.csv', 'a') as op:
-    op.write(Date)
-    op.write(' | ')
-    op.write(News)
-    op.write("\n")
-a = open('api.csv').read()
-b = re.sub('\+[0-9]+', '', a)
-c = b.replace('  ', ' ')
-with open('api.csv', 'w') as op:
-    op.write(c)
-  
+  if News not in news:
+    news.append(News)
+
+y = [list(x) for x in zip(date, news)]
+
+header = ['Date', 'News']
+content = y
+
+with open('api.csv', 'w', encoding= 'UTF8', newline='') as file:
+  writer= csv.writer(file)
+  writer.writerow(header)
+  writer.writerows(y)
+
+app = Flask(__name__)
+api= Api(app)
+csv_path = './api.csv'
+class api_data(Resource):
+    def get(self):
+        data = pd.read_csv(csv_path)
+        data = data.to_dict()
+        return {sym: data}, 200
+
+api.add_resource(api_data, '/csv')
+
+if __name__ == '__main__':
+    app.run(debug=True)
