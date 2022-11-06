@@ -10,7 +10,7 @@ class api_data(Resource):
     def get(self):
         data = pd.read_csv(csv_path)
         data = data.to_dict()
-        return {'Data': data}, 200
+        return {'sym': data}, 200
 
 api.add_resource(api_data, '/csv')
 
