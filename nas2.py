@@ -4,8 +4,6 @@ import ssl
 import re
 import csv
 
-import pandas as pd
-
 ctx = ssl.create_default_context()
 ctx.check_hostname= False
 ctx.verify_mode = ssl.CERT_NONE
@@ -36,26 +34,7 @@ for child in tree.findall('.//item'):
   if News not in news:
     news.append(News)
 
-y = [list(x) for x in zip(date, news)]
+y = dict(zip(date, news))
+print(y)
 
 header = ['Date', 'News']
-content = y
-
-with open('api.csv', 'w', encoding= 'UTF8', newline='') as file:
-  writer= csv.writer(file)
-  writer.writerow(header)
-  writer.writerows(y)
-
-app = Flask(__name__)
-api= Api(app)
-csv_path = './api.csv'
-class api_data(Resource):
-    def get(self):
-        data = pd.read_csv(csv_path)
-        data = data.to_dict()
-        return {sym: data}, 200
-
-api.add_resource(api_data, '/csv')
-
-if __name__ == '__main__':
-    app.run(debug=True)
